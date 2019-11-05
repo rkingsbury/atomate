@@ -19,6 +19,7 @@ def wf_scan_opt(structure, c=None):
     user_incar_settings = c.get("USER_INCAR_SETTINGS", {})
     half_kpts = c.get("HALF_KPOINTS_FIRST_RELAX", HALF_KPOINTS_FIRST_RELAX)
     ediffg = user_incar_settings.get("EDIFFG", -0.05)
+    vdw = c.get("vdw", None)
 
     wf = get_wf(
         structure,
@@ -27,7 +28,8 @@ def wf_scan_opt(structure, c=None):
             structure, user_incar_settings=user_incar_settings),
         common_params={
             "vasp_cmd": vasp_cmd,
-            "db_file": db_file
+            "db_file": db_file,
+            "vdw": vdw
         })
 
     wf = use_custodian(
