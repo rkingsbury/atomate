@@ -85,7 +85,7 @@ def wf_scan_static(structure, c=None):
             "ediffg": ediffg,
             "max_force_threshold": 0,
             "half_kpts_first_relax": half_kpts,
-            "job_type": "scan_ryan_static",
+            "job_type": "metagga_static",
             "vasp_cmd": vasp_cmd
         })
 
