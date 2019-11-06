@@ -20,17 +20,16 @@ def wf_scan_opt(structure, c=None):
     half_kpts = c.get("HALF_KPOINTS_FIRST_RELAX", HALF_KPOINTS_FIRST_RELAX)
     ediffg = user_incar_settings.get("EDIFFG", -0.05)
     vdw = c.get("vdw", None)
-    job_type = c.get("job_type":"metagga_opt_run")
+    job_type = c.get("job_type","metagga_opt_run")
 
     wf = get_wf(
         structure,
         "optimize_only.yaml",
         vis=MVLScanRelaxSet(
-            structure, user_incar_settings=user_incar_settings),
+            structure, user_incar_settings=user_incar_settings,vdw=vdw),
         common_params={
             "vasp_cmd": vasp_cmd,
             "db_file": db_file,
-            "vdw": vdw
         })
 
     wf = use_custodian(
@@ -42,6 +41,16 @@ def wf_scan_opt(structure, c=None):
             "job_type": job_type,
             "vasp_cmd": vasp_cmd
         })
+        
+    wf = add_common_powerups(wf, c)
+
+    if c.get("ADD_WF_METADATA", ADD_WF_METADATA):
+        wf = add_wf_metadata(wf, structure)
+
+    if c.get("REMOVE_WAVECAR", REMOVE_WAVECAR):
+        wf = clean_up_files(wf)
+
+    return wf
 
 def wf_scan_static(structure, c=None):
 

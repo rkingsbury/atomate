@@ -144,7 +144,7 @@ class RunVaspCustodian(FiretaskBase):
                                                  half_kpts_first_relax=self.get("half_kpts_first_relax", HALF_KPOINTS_FIRST_RELAX))
         
         elif job_type == "metagga_static":
-            jobs = VaspJob.metagga_static(vasp_cmd, auto_npar=auto_npar))
+            jobs = VaspJob.metagga_static(vasp_cmd, auto_npar=auto_npar)
 
         elif job_type == "full_opt_run":
             jobs = VaspJob.full_opt_run(vasp_cmd, auto_npar=auto_npar,
