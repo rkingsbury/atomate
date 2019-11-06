@@ -20,6 +20,7 @@ def wf_scan_opt(structure, c=None):
     half_kpts = c.get("HALF_KPOINTS_FIRST_RELAX", HALF_KPOINTS_FIRST_RELAX)
     ediffg = user_incar_settings.get("EDIFFG", -0.05)
     vdw = c.get("vdw", None)
+    job_type = c.get("job_type":"metagga_opt_run")
 
     wf = get_wf(
         structure,
@@ -38,9 +39,48 @@ def wf_scan_opt(structure, c=None):
             "ediffg": ediffg,
             "max_force_threshold": 0,
             "half_kpts_first_relax": half_kpts,
-            "job_type": "metagga_opt_run",
+            "job_type": job_type,
             "vasp_cmd": vasp_cmd
         })
+
+def wf_scan_static(structure, c=None):
+
+    c = c or {}
+    vasp_cmd = c.get("VASP_CMD", VASP_CMD)
+    db_file = c.get("DB_FILE", DB_FILE)
+    user_incar_settings = c.get("USER_INCAR_SETTINGS", {"NSW":0,
+                                                        })
+    half_kpts = c.get("HALF_KPOINTS_FIRST_RELAX", HALF_KPOINTS_FIRST_RELAX)
+    ediffg = user_incar_settings.get("EDIFFG", -0.05)
+    vdw = c.get("vdw", None)
+
+    """
+    Perform a static SCAN calculation
+
+    A static PBE calculation is performed first to precondition the wavefunctions. 
+    """
+
+    wf = get_wf(
+        structure,
+        "optimize_only.yaml",
+        vis=MVLScanRelaxSet(
+            structure, user_incar_settings=user_incar_settings),
+        common_params={
+            "vasp_cmd": vasp_cmd,
+            "db_file": db_file,
+            "vdw": vdw
+        })
+
+    wf = use_custodian(
+        wf,
+        custodian_params={
+            "ediffg": ediffg,
+            "max_force_threshold": 0,
+            "half_kpts_first_relax": half_kpts,
+            "job_type": "scan_ryan_static",
+            "vasp_cmd": vasp_cmd
+        })
+
     wf = add_common_powerups(wf, c)
 
     if c.get("ADD_WF_METADATA", ADD_WF_METADATA):
