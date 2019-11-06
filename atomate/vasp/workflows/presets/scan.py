@@ -29,9 +29,10 @@ def wf_scan_opt(structure, c=None):
             structure, user_incar_settings=user_incar_settings,vdw=vdw),
         common_params={
             "vasp_cmd": vasp_cmd,
-            "db_file": db_file,
+            "db_file": db_file
+            },
         params=[{"name":"SCAN optimization"}]
-        })
+        )
 
     wf = use_custodian(
         wf,
