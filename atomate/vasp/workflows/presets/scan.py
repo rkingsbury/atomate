@@ -30,6 +30,7 @@ def wf_scan_opt(structure, c=None):
         common_params={
             "vasp_cmd": vasp_cmd,
             "db_file": db_file,
+        params=[{"name":"SCAN optimization"}]
         })
 
     wf = use_custodian(
@@ -77,7 +78,9 @@ def wf_scan_static(structure, c=None):
         common_params={
             "vasp_cmd": vasp_cmd,
             "db_file": db_file,
-        })
+        },
+        params=[{"name":"static-SCAN"}]
+        )
 
     wf = use_custodian(
         wf,
