@@ -41,7 +41,7 @@ def wf_scan_opt(structure, c=None):
             "job_type": job_type,
             "vasp_cmd": vasp_cmd
         })
-        
+
     wf = add_common_powerups(wf, c)
 
     if c.get("ADD_WF_METADATA", ADD_WF_METADATA):
@@ -73,11 +73,10 @@ def wf_scan_static(structure, c=None):
         structure,
         "optimize_only.yaml",
         vis=MVLScanRelaxSet(
-            structure, user_incar_settings=user_incar_settings),
+            structure, user_incar_settings=user_incar_settings,vdw=vdw),
         common_params={
             "vasp_cmd": vasp_cmd,
             "db_file": db_file,
-            "vdw": vdw
         })
 
     wf = use_custodian(
