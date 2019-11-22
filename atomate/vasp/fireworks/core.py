@@ -72,7 +72,7 @@ class OptimizeFW(Firework):
         
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles("$VDW_KERNAL_BINDAT"))
+            t.append(CopyFiles(from_dir="$VDW_KERNAL_BINDAT"))
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, job_type=job_type,
                                   max_force_threshold=max_force_threshold,
@@ -81,7 +81,7 @@ class OptimizeFW(Firework):
                                   half_kpts_first_relax=half_kpts_first_relax))
         
         # Delete the VdW kernel
-        t.append(DeleteFiles(["vdw_kernel.bindat"]))
+        t.append(DeleteFiles(files=["vdw_kernel.bindat"]))
 
         t.append(PassCalcLocs(name=name))
         t.append(
@@ -130,7 +130,7 @@ class StaticFW(Firework):
 
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles("$VDW_KERNAL_BINDAT"))
+            t.append(CopyFiles(from_dir="$VDW_KERNAL_BINDAT"))
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
@@ -151,7 +151,7 @@ class StaticFW(Firework):
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
 
         # Delete the VdW kernel
-        t.append(DeleteFiles(["vdw_kernel.bindat"]))
+        t.append(DeleteFiles(files=["vdw_kernel.bindat"]))
 
         t.append(PassCalcLocs(name=name))
         t.append(
