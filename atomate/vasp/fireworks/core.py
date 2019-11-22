@@ -16,7 +16,7 @@ from pymatgen import Structure
 from pymatgen.io.vasp.sets import MPRelaxSet, MITMDSet, MITRelaxSet, \
     MPStaticSet, MPSOCSet
 
-from atomate.common.firetasks.glue_tasks import PassCalcLocs
+from atomate.common.firetasks.glue_tasks import PassCalcLocs, CopyFiles, DeleteFiles
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 from atomate.vasp.firetasks.neb_tasks import TransferNEBTask
 from atomate.vasp.firetasks.parse_outputs import VaspToDb, BoltztrapToDb
