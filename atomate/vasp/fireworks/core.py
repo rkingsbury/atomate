@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import warnings
-import os
 
 from atomate.vasp.config import HALF_KPOINTS_FIRST_RELAX, RELAX_MAX_FORCE, \
     VASP_CMD, DB_FILE
@@ -73,7 +72,8 @@ class OptimizeFW(Firework):
         
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=os.path.expandvars("$VDW_KERNAL_DIR")))
+            vdw_kernel_dir = env_chk(self.get('vdw_kernel_dir'), fw_spec)
+            t.append(CopyFiles(from_dir=vdw_kernel_dir))
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, job_type=job_type,
                                   max_force_threshold=max_force_threshold,
@@ -131,7 +131,8 @@ class StaticFW(Firework):
 
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=os.path.expandvars("$VDW_KERNAL_DIR")))
+            vdw_kernel_dir = env_chk(self.get('vdw_kernel_dir'), fw_spec)
+            t.append(CopyFiles(from_dir=vdw_kernel_dir))
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
