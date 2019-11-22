@@ -69,11 +69,20 @@ class OptimizeFW(Firework):
         t = []
         t.append(WriteVaspFromIOSet(structure=structure,
                                     vasp_input_set=vasp_input_set))
+        
+        if vasp_input_set.vdw is not None:
+            # Copy the pre-compiled VdW kernel for VASP, if required
+            t.CopyFiles("$VDW_KERNAL_BINDAT")
+
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, job_type=job_type,
                                   max_force_threshold=max_force_threshold,
                                   ediffg=ediffg,
                                   auto_npar=auto_npar,
                                   half_kpts_first_relax=half_kpts_first_relax))
+        
+        # Delete the VdW kernel
+        t.DeleteFiles(["vdw_kernel.bindat"])
+
         t.append(PassCalcLocs(name=name))
         t.append(
             VaspToDb(db_file=db_file, additional_fields={"task_label": name}))
@@ -119,6 +128,10 @@ class StaticFW(Firework):
 
         fw_name = "{}-{}".format(structure.composition.reduced_formula if structure else "unknown", name)
 
+        if vasp_input_set.vdw is not None:
+            # Copy the pre-compiled VdW kernel for VASP, if required
+            t.CopyFiles("$VDW_KERNAL_BINDAT")
+
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
             t.append(WriteVaspStaticFromPrev(other_params=vasp_input_set_params))
@@ -136,6 +149,10 @@ class StaticFW(Firework):
             raise ValueError("Must specify structure or previous calculation")
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
+
+        # Delete the VdW kernel
+        t.DeleteFiles(["vdw_kernel.bindat"])
+        
         t.append(PassCalcLocs(name=name))
         t.append(
             VaspToDb(db_file=db_file, **vasptodb_kwargs))
