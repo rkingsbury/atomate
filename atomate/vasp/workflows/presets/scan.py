@@ -12,15 +12,20 @@ __email__ = 'shyamd@lbl.gov, ajain@lbl.gov'
 
 
 def wf_scan_opt(structure, c=None):
+    """
+    ediffg specifies the value to be used in the 2nd run of the double opt ONLY
+    the value in USER_INCAR_SETTINGS is used for the first two
+    """
 
     c = c or {}
     vasp_cmd = c.get("VASP_CMD", VASP_CMD)
     db_file = c.get("DB_FILE", DB_FILE)
     user_incar_settings = c.get("USER_INCAR_SETTINGS", {})
     half_kpts = c.get("HALF_KPOINTS_FIRST_RELAX", HALF_KPOINTS_FIRST_RELAX)
-    ediffg = user_incar_settings.get("EDIFFG", -0.05)
     vdw = c.get("vdw", None)
     job_type = c.get("job_type","metagga_opt_run")
+    initial_ediffg = c.get("initial_ediffg",None)
+    ediffg = c.get("ediffg",-0.05)
 
     wf = get_wf(
         structure,
@@ -41,7 +46,8 @@ def wf_scan_opt(structure, c=None):
             "max_force_threshold": 0,
             "half_kpts_first_relax": half_kpts,
             "job_type": job_type,
-            "vasp_cmd": vasp_cmd
+            "vasp_cmd": vasp_cmd,
+            "initial_ediffg": initial_ediffg
         })
 
     wf = add_common_powerups(wf, c)

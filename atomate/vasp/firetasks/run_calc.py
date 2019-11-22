@@ -93,7 +93,7 @@ class RunVaspCustodian(FiretaskBase):
     required_params = ["vasp_cmd"]
     optional_params = ["job_type", "handler_group", "max_force_threshold", "scratch_dir",
                        "gzip_output", "max_errors", "ediffg", "auto_npar", "gamma_vasp_cmd",
-                       "wall_time","half_kpts_first_relax"]
+                       "wall_time","half_kpts_first_relax","initial_ediffg"]
 
     def run_task(self, fw_spec):
 
@@ -141,7 +141,8 @@ class RunVaspCustodian(FiretaskBase):
         elif job_type == "metagga_full_opt":
             jobs = VaspJob.metagga_full_opt(vasp_cmd, auto_npar=auto_npar,
                                                  ediffg=self.get("ediffg"),
-                                                 half_kpts_first_relax=self.get("half_kpts_first_relax", HALF_KPOINTS_FIRST_RELAX))
+                                                 half_kpts_first_relax=self.get("half_kpts_first_relax", HALF_KPOINTS_FIRST_RELAX),
+                                                 initial_ediffg=self.get("initial_ediffg"))
         
         elif job_type == "metagga_static":
             jobs = VaspJob.metagga_static(vasp_cmd, auto_npar=auto_npar)
