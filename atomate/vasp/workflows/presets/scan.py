@@ -25,7 +25,7 @@ def wf_scan_opt(structure, c=None):
     vdw = c.get("vdw", None)
     job_type = c.get("job_type","metagga_opt_run")
     initial_ediffg = c.get("initial_ediffg",None)
-    ediffg = c.get("ediffg",-0.05)
+    ediffg = user_incar_settings.get("EDIFFG",-0.05)
 
     wf = get_wf(
         structure,
