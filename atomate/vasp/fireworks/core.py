@@ -5,6 +5,8 @@ import warnings
 from atomate.vasp.config import HALF_KPOINTS_FIRST_RELAX, RELAX_MAX_FORCE, \
     VASP_CMD, DB_FILE
 
+from atomate.utils.utils import env_chk
+
 """
 Defines standardized Fireworks that can be chained easily to perform various
 sequences of VASP calculations.
@@ -72,7 +74,7 @@ class OptimizeFW(Firework):
         
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=">>vdw_kernel_dir<<"))
+            t.append(CopyFiles(from_dir=env_chk(">>vdw_kernel_dir<<",fw_spec))
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, job_type=job_type,
                                   max_force_threshold=max_force_threshold,
@@ -130,7 +132,7 @@ class StaticFW(Firework):
 
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=">>vdw_kernel_dir<<"))
+            t.append(CopyFiles(from_dir=env_chk(">>vdw_kernel_dir<<",fw_spec))
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
