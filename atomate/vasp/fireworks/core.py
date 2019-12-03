@@ -72,7 +72,7 @@ class OptimizeFW(Firework):
         
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=VDW_KERNEL_DIR))
+            t.append(CopyFiles(from_dir="/global/common/cori/software/vasp/vdw_kernal"))
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, job_type=job_type,
                                   max_force_threshold=max_force_threshold,
@@ -130,7 +130,7 @@ class StaticFW(Firework):
 
         if vasp_input_set.vdw is not None:
             # Copy the pre-compiled VdW kernel for VASP, if required
-            t.append(CopyFiles(from_dir=VDW_KERNEL_DIR))
+            t.append(CopyFiles(from_dir="/global/common/cori/software/vasp/vdw_kernal"))
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
