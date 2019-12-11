@@ -179,6 +179,7 @@ class ScanOptimizeFW(Firework):
                             "_set": {
                                 "METAGGA": vasp_input_set.incar.get("METAGGA"),
                                 "ISTART": 1,
+                                "ICHARG": 1,
                                 "EDIFFG": vasp_input_set.incar.get("EDIFFG"),
                             }
                     }
