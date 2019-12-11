@@ -13,8 +13,8 @@ sequences of VASP calculations.
 from fireworks import Firework
 
 from pymatgen import Structure
-from pymatgen.io.vasp.sets import MPRelaxSet, MITMDSet, MITRelaxSet, \
-    MPStaticSet, MPSOCSet
+from pymatgen.io.vasp.sets import MPRelaxSet, MPScanRelaxSet, MITMDSet, \
+    MITRelaxSet, MPStaticSet, MPSOCSet
 
 from atomate.common.firetasks.glue_tasks import PassCalcLocs, GzipDir, \
                                             CopyFiles, DeleteFiles, \
@@ -85,13 +85,14 @@ class OptimizeFW(Firework):
                                              structure.composition.reduced_formula, name),
                                          **kwargs)
 
+
 class ScanOptimizeFW(Firework):
 
     def __init__(self, structure, name="SCAN structure optimization",
                  vasp_input_set=None,
                  vasp_cmd=VASP_CMD, override_default_vasp_params=None,
                  db_file=DB_FILE,
-                 vdw_kernel_dir = VDW_KERNEL_DIR,
+                 vdw_kernel_dir=VDW_KERNEL_DIR,
                  parents=None,
                  **kwargs):
         """
@@ -101,25 +102,26 @@ class ScanOptimizeFW(Firework):
         is a conventional GGA run and serves to precondition the geometry and
         wavefunctions. The second step is a SCAN structure optimization.
 
-        By default, the first optimization is force converged with 
+        By default, the first optimization is force converged with
         EDIFFG = -0.05, and the second optimization is force converged with
         EDIFFG=-0.02. Convergence paramters for the first and second
-        optimizations can be overridden by passing 'user_incar_settings_1' and 
+        optimizations can be overridden by passing 'user_incar_settings_1' and
         'user_incar_settings_2', respectively.
 
         Args:
             structure (Structure): Input structure.
             name (str): Name for the Firework.
-            vasp_input_set (VaspInputSet): input set to use. Defaults to MPScanRelaxSet() if None.
-            override_default_vasp_params (dict): If this is not None, and vasp_input_set is None,
-                these params are passed to the default vasp_input_set, i.e., 
-                MPScanRelaxSet. This allows one to easily override
-                some settings, e.g., user_incar_settings, etc.
+            vasp_input_set (VaspInputSet): input set to use. Defaults to
+                MPScanRelaxSet() if None.
+            override_default_vasp_params (dict): If this is not None, and
+                vasp_input_set is None, these params are passed to the default
+                vasp_input_set, i.e., MPScanRelaxSet. This allows one to easily
+                override some settings, e.g., user_incar_settings, etc.
             vasp_cmd (str): Command to run vasp. Supports env_chk.
-            vdw_kernel_dir (str): Directory containing the pre-compiled VdW kernel.
-                Supports env_chk.
-            db_file (str): Path to file specifying db credentials to place output parsing.
-                Supports env_chk.
+            vdw_kernel_dir (str): Directory containing the pre-compiled VdW
+                kernel. Supports env_chk.
+            db_file (str): Path to file specifying db credentials to place
+                output parsing. Supports env_chk.
             parents ([Firework]): Parents of this particular Firework.
             \*\*kwargs: Other kwargs that are passed to Firework.__init__.
         """
@@ -131,7 +133,7 @@ class ScanOptimizeFW(Firework):
         # write the VASP input files based on MPScanRelaxSet
         t.append(WriteVaspFromIOSet(structure=structure,
                                     vasp_input_set=vasp_input_set))
-        
+
         # pass the CalcLoc so that CopyFilesFromCalcLoc can find the directory
         t.append(PassCalcLocs(name=name))
 
@@ -141,14 +143,14 @@ class ScanOptimizeFW(Firework):
 
         # Copy original inputs with the ".orig" suffix
         t.append(CopyFilesFromCalcLoc(calc_loc=True,
-                                name_append=".orig",
-                                exclude_files=['vdw_kernel.bindat']))
+                                      name_append=".orig",
+                                      exclude_files=['vdw_kernel.bindat']))
 
         # Update the INCAR for the GGA preconditioning step
-        pre_opt_settings = {"_set": {"METAGGA": None, 
-                                                  "LWAVE": True,
-                                                  "EDIFFG":-0.05}}
-        
+        pre_opt_settings = {"_set": {"METAGGA": None,
+                                     "LWAVE": True,
+                                     "EDIFFG": -0.05}}
+
         # Disable vdW for the precondition step
         if vasp_input_set.incar.get("LUSE_VDW", None):
             pre_opt_settings.update(
@@ -156,7 +158,7 @@ class ScanOptimizeFW(Firework):
                         "_unset": {"LUSE_VDW": True, "BPARAM": 15.7}
                             }
                 )
-        
+
         t.append(ModifyIncar(incar_dictmod=pre_opt_settings))
 
         # Run the GGA precondition step
@@ -164,10 +166,13 @@ class ScanOptimizeFW(Firework):
 
         # Copy GGA outputs with '.precondition' suffix, copy CONTCAR to POSCAR
         t.append(CopyVaspOutputs(calc_loc=True, contcar_to_poscar=True,
-                                        additional_files=["CHGCAR",
-                                            "AECCAR0","AECCAR1","AECCAR2",
-                                            "LOCPOT","ELFCAR"],
-                                        suffix=".precondition"))
+                                 additional_files=["CHGCAR",
+                                                   "AECCAR0",
+                                                   "AECCAR1",
+                                                   "AECCAR2",
+                                                   "LOCPOT",
+                                                   "ELFCAR"],
+                                 suffix=".precondition"))
 
         # Update the INCAR for the SCAN optimization  step
         post_opt_settings = {
@@ -192,11 +197,14 @@ class ScanOptimizeFW(Firework):
         t.append(RunVaspDirect(vasp_cmd=vasp_cmd))
 
         # Copy the outputs with '.relax1' suffix
-        t.append(CopyVaspOutputs(calc_loc=True, 
-                                additional_files=["CHGCAR",
-                                            "AECCAR0","AECCAR1","AECCAR2",
-                                            "LOCPOT","ELFCAR"],
-                                suffix=".relax1"))
+        t.append(CopyVaspOutputs(calc_loc=True,
+                                 additional_files=["CHGCAR",
+                                                   "AECCAR0",
+                                                   "AECCAR1",
+                                                   "AECCAR2",
+                                                    "LOCPOT",
+                                                    "ELFCAR"],
+                                 suffix=".relax1"))
 
         # Parse the outputs into the database
         t.append(PassCalcLocs(name=name))
@@ -204,15 +212,16 @@ class ScanOptimizeFW(Firework):
             VaspToDb(db_file=db_file, additional_fields={"task_label": name}))
 
         # Delete the VdW kernel, if present
-        t.append(DeleteFiles(files=["vdw_kernel.bindat","WAVECAR"]))
+        t.append(DeleteFiles(files=["vdw_kernel.bindat", "WAVECAR"]))
 
         # gzip the output
         t.append(GzipDir())
 
-        super(ScanOptimizeFW, self).__init__(t, parents=parents, name="{}-{}".
-                                         format(
-                                             structure.composition.reduced_formula, name),
-                                         **kwargs)
+        super(ScanOptimizeFW, self).__init__(t, parents=parents,
+                                             name="{}-{}".format(
+                                                structure.composition.reduced_formula, name),
+                                            **kwargs)
+
 
 class StaticFW(Firework):
 
