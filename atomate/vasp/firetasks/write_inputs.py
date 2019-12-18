@@ -19,7 +19,8 @@ from pymatgen.core.structure import Structure
 from pymatgen.alchemy.materials import TransformedStructure
 from pymatgen.alchemy.transmuters import StandardTransmuter
 from pymatgen.io.vasp import Incar, Poscar, Potcar, PotcarSingle, Vasprun
-from pymatgen.io.vasp.sets import MPStaticSet, MPNonSCFSet, MPSOCSet, MPHSEBSSet, MPNMRSet
+from pymatgen.io.vasp.sets import MPStaticSet, MPNonSCFSet, MPSOCSet, MPHSEBSSet, \
+    MPNMRSet, MPScanRelaxSet
 
 from atomate.utils.utils import env_chk, load_class
 from atomate.vasp.firetasks.glue_tasks import GetInterpolatedPOSCAR
