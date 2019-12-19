@@ -163,7 +163,7 @@ class ScanOptimizeFW(Firework):
             db_file (str): Path to file specifying db credentials to place
                 output parsing. Supports env_chk.
             parents ([Firework]): Parents of this particular Firework.
-            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+            **kwargs: Other kwargs that are passed to Firework.__init__.
         """
         override_default_vasp_params = override_default_vasp_params or {}
         orig_input_set = vasp_input_set or MPScanRelaxSet(
@@ -193,7 +193,9 @@ class ScanOptimizeFW(Firework):
         # Copy original inputs with the ".orig" suffix
         t.append(
             CopyFilesFromCalcLoc(
-                calc_loc=True, name_append=".orig", exclude_files=["vdw_kernel.bindat"]
+                calc_loc=True,
+                name_append=".orig",
+                exclude_files=["vdw_kernel.bindat", "FW.json", "FW--*"],
             )
         )
 
@@ -216,7 +218,7 @@ class ScanOptimizeFW(Firework):
             CopyFilesFromCalcLoc(
                 calc_loc=True,
                 name_append=".relax1",
-                exclude_files=["vdw_kernel.bindat", "*.orig"],
+                exclude_files=["vdw_kernel.bindat", "FW.json", "FW--*", "*.orig"],
             )
         )
 
@@ -239,7 +241,13 @@ class ScanOptimizeFW(Firework):
             CopyFilesFromCalcLoc(
                 calc_loc=True,
                 name_append=".relax2",
-                exclude_files=["vdw_kernel.bindat", "*.orig", "*.relax1"],
+                exclude_files=[
+                    "vdw_kernel.bindat",
+                    "FW.json",
+                    "FW--*",
+                    "*.orig",
+                    "*.relax1",
+                ],
             )
         )
 
@@ -252,7 +260,7 @@ class ScanOptimizeFW(Firework):
                 files=[
                     "vdw_kernel.bindat",
                     "WAVECAR*",  # All WAVECARs,
-                    "*.json",
+                    "custodian.json",
                     "*CAR",  # All files that end in "CAR"
                     "EIGENVAL",
                     "AECCAR?",
@@ -261,7 +269,9 @@ class ScanOptimizeFW(Firework):
                     "REPORT",
                     "std_err.txt",
                     "vasp.out",
-                    "CHG"
+                    "CHG",
+                    "PCDAT",
+                    "vasprun.xml",
                 ]
             )
         )
