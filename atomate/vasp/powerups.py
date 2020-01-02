@@ -115,7 +115,8 @@ def use_no_vasp(original_wf, ref_dirs):
 
 
 def use_fake_vasp(original_wf, ref_dirs, params_to_check=None, check_incar=True,
-                  check_kpoints=True ,check_poscar=True, check_potcar=True):
+                  check_kpoints=True, check_poscar=True, check_potcar=True,
+                  clear_inputs=True):
     """
     Replaces all tasks with "RunVasp" (e.g. RunVaspDirect) to be RunVaspFake. Thus, we do not
     actually run VASP but copy pre-determined inputs and outputs.
@@ -128,6 +129,7 @@ def use_fake_vasp(original_wf, ref_dirs, params_to_check=None, check_incar=True,
         check_kpoints (bool): whether to confirm the KPOINTS params (default: True)
         check_poscar (bool): whether to confirm the POSCAR params (default: True)
         check_potcar (bool): whether to confirm the POTCAR params (default: True)
+        clear_inputs (bool): whether to delete VASP input files after running (default: True)
 
     Returns:
         Workflow
@@ -146,7 +148,8 @@ def use_fake_vasp(original_wf, ref_dirs, params_to_check=None, check_incar=True,
                                         check_incar=check_incar,
                                         check_kpoints=check_kpoints,
                                         check_poscar=check_poscar,
-                                        check_potcar=check_potcar
+                                        check_potcar=check_potcar,
+                                        clear_inputs=clear_inputs
                                         )
                     if "RunVaspCustodian" in str(t) and t.get("job_type") == "neb":
                         original_wf.fws[idx_fw].tasks[idx_t] = \
