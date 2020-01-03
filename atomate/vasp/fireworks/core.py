@@ -179,6 +179,11 @@ class ScanOptimizeFW(Firework):
                                is not supported by this InputSet."
             )
 
+        if vasp_input_set.incar["ISIF"] in (0, 1, 2, 7) and job_type == "double_relaxation":
+            warnings.warn(
+                "A double relaxation run might not be appropriate with ISIF {}".format(
+                    vasp_input_set.incar["ISIF"]))
+        
         t = []
         # write the VASP input files based on MPScanRelaxSet
         t.append(WriteVaspFromIOSet(structure=structure, vasp_input_set=orig_input_set))
