@@ -502,7 +502,7 @@ class ScanSolvationFW(Firework):
         # gzip the output
         t.append(GzipDir())
 
-        super(ScanOptimizeFW, self).__init__(
+        super(ScanSolvationFW, self).__init__(
             t,
             parents=parents,
             name="{}-{}".format(structure.composition.reduced_formula, name),
