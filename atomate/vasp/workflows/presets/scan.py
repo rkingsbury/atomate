@@ -50,3 +50,37 @@ def wf_scan_opt(structure, c=None):
         wf = add_wf_metadata(wf, structure)
 
     return wf
+
+
+def wf_scan_solvation(structure, c=None):
+    """
+    Solvation energy using the SCAN metaGGA functional and VASPsol.
+
+    1. GGA static+WAVECAR
+    2. SCAN static+WAVECAR
+    3. SCAN static with VASPsol polarizable continuum enabled
+    """
+
+    c = c or {} 
+    user_incar_settings = c.get("USER_INCAR_SETTINGS", {})
+    vdw = c.get("vdw")
+    bandgap = c.get("bandgap", 0)
+
+    wf = get_wf(
+        structure,
+        "SCAN_solvation.yaml",
+        vis=MPScanRelaxSet(
+            structure,
+            user_incar_settings=user_incar_settings,
+            vdw=vdw,
+            bandgap=bandgap
+        ),
+        params=[{"name": "SCAN solvation energy"}],
+    )
+
+    wf = add_common_powerups(wf, c)
+
+    if c.get("ADD_WF_METADATA", ADD_WF_METADATA):
+        wf = add_wf_metadata(wf, structure)
+
+    return wf
